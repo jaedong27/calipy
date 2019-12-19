@@ -3,9 +3,8 @@ import sys
 import cv2
 import numpy as np
 import json
-from ProjectiveObject import ProjectiveObject
-sys.path.append("C:/Users/jaedong/Desktop/VRTProjectionIntervalDetection/Util")
-import img
+from .ProjectiveObject import ProjectiveObject
+from . import img
 import pptk
 
 class DepthCamera(ProjectiveObject):

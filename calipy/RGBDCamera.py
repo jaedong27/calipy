@@ -1,14 +1,12 @@
 import os
 import sys
-sys.path.append("C:/Users/jaedong/Desktop/VRTProjectionIntervalDetection/Util")
-sys.path.append("C:/Users/jaedong/Desktop/VRTProjectionIntervalDetection/ViewTransformer")
 import cv2
 import numpy as np
 import json
-from DepthCamera import DepthCamera
-from ColorCamera import ColorCamera
-from Transform import Transform
-import img
+from calipy.DepthCamera import DepthCamera
+from calipy.ColorCamera import ColorCamera
+from calipy.Transform import Transform
+import calipy.img
 import pptk
 
 class RGBDCamera():
