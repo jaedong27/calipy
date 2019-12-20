@@ -36,3 +36,9 @@ def normalize_image(frame):
     frame = np.clip(frame, 0, 5000) #normalize to 0-5000mm
     frame = np.uint8(frame / 5000.0 * 255)
     return frame
+
+def drawLines(img, points, color = (255,0,0)):
+    for v1, v2 in zip(np.transpose(points[:,:-1]), np.transpose(points[:,1:])):
+        print(v1, v2)
+        cv2.line( img, (int(v1[0]),int(v1[1])), (int(v2[0]),int(v2[1])), color, 1 )
+    return img

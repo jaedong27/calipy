@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import json
 from .ProjectiveObject import ProjectiveObject
-from . import img
+from . import imglib
 import pptk
 
 class DepthCamera(ProjectiveObject):
@@ -26,7 +26,7 @@ class DepthCamera(ProjectiveObject):
         return pointcloud
 
     def getPointCloudFromDepthImageFile(self, depth_img_path):
-        depth_img = img.imreadKorean(depth_img_path)
+        depth_img = imglib.imreadKorean(depth_img_path)
         return self.getPointCloudFromDepthImage(depth_img)
 
 if __name__=="__main__":
@@ -35,7 +35,7 @@ if __name__=="__main__":
     print(dc.distortion)
     print(dc.width)
     print(dc.height)
-    image = img.imreadKorean("depth.png")
+    image = imglib.imreadKorean("depth.png")
     #print(image.shape)
     pointcloud = dc.getPointCloudFromDepthImage(image)
     v = pptk.viewer(np.transpose(pointcloud))
