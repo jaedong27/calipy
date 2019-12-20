@@ -9,7 +9,7 @@ import pptk
 
 class DepthCamera(ProjectiveObject):
     def __init__(self, param_path = ""):
-        super().loadJson(param_path)
+        super().__init__(param_path)
 
         grid = np.indices((self.height, self.width))
         v = np.array([grid[0].ravel()])
