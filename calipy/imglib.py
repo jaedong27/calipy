@@ -42,3 +42,13 @@ def drawLines(img, points, color = (255,0,0)):
         print(v1, v2)
         cv2.line( img, (int(v1[0]),int(v1[1])), (int(v2[0]),int(v2[1])), color, 1 )
     return img
+
+def getWarpedImageUsingH(img, h): # H scale is in 0.0 ~ 1.0
+    width = img.shape[1]
+    height = img.shape[0]
+    to_proj_scale = np.array([[width, 0, 0],[0, height, 0], [0, 0, 1]])
+    to_norm_scale = np.linalg.inv(to_proj_scale)
+    to_proj_scale.astype(np.float32)
+    to_norm_scale.astype(np.float32)
+    h = np.dot(to_proj_scale, np.dot(h, to_norm_scale))
+    return cv2.warpPerspective(img, h, (width, height))
