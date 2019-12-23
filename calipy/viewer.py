@@ -53,8 +53,11 @@ class vtkRenderer():
 
         self.ren.SetBackground(0, 0.1, 0)
 
+        self.actor_list = {}
+
         axes = vtk.vtkAxesActor()
         self.ren.AddActor(axes)
+        self.actor_list["axes"] = axes
         self.ren.ResetCamera()
 
     def setMainCamera(self, R = np.eye(3), t = np.zeros((3,1))):
@@ -72,7 +75,16 @@ class vtkRenderer():
         camera.SetViewAngle(80)
         self.ren.SetActiveCamera(camera)
 
-    def addLines(self, points, idx_list = None): # points => numpy vector [3, 0~n]
+    def removeActorByName(self, name):
+        #print(self.actor_list)
+        if name in self.actor_list.keys():
+            actor = self.actor_list.pop(name)
+            self.ren.RemoveActor(actor)
+            #print("remove! ", name)
+            
+
+    def addLines(self, name, points, idx_list = None): # points => numpy vector [3, 0~n]
+        self.removeActorByName(name)
         vtkpoints = vtk.vtkPoints()
         vtklines = vtk.vtkCellArray()
 
@@ -106,8 +118,10 @@ class vtkRenderer():
         polygonActor.SetMapper(polygonMapper)
 
         self.ren.AddActor(polygonActor)
+        self.actor_list[name] = polygonActor
 
-    def addCamera(self, R = np.eye(3), t = np.zeros((3,1)), cs = 0.1):
+    def addCamera(self, name, R = np.eye(3), t = np.zeros((3,1)), cs = 0.1): 
+        self.removeActorByName(name)
         camera_points = np.zeros((12,3))
         camera_points[0,:] = np.array([-cs/2, -cs/2, cs])
         camera_points[1] = np.array([ cs/2, -cs/2, cs])
@@ -173,8 +187,10 @@ class vtkRenderer():
         polygonActor.SetMapper(polygonMapper)
         polygonActor.GetProperty().SetPointSize(0.1)
         self.ren.AddActor(polygonActor)
+        self.actor_list[name] = polygonActor
 
-    def drawPoints(self, point_list, input_color=np.array([[255,0,0]])):
+    def drawPoints(self, name, point_list, input_color=np.array([[255,0,0]])):
+        self.removeActorByName(name)
         points = vtk.vtkPoints()
         vertices = vtk.vtkCellArray()
         colors = vtk.vtkUnsignedCharArray()
@@ -209,6 +225,7 @@ class vtkRenderer():
         polygonActor.SetMapper(polygonMapper)
         polygonActor.GetProperty().SetPointSize(2)
         self.ren.AddActor(polygonActor)
+        self.actor_list[name] = polygonActor
 
     def showImage(self):
         if self.qtwidget_mode == False:
