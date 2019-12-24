@@ -227,7 +227,7 @@ class vtkRenderer():
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
-    def showImage(self):
+    def render(self):
         if self.qtwidget_mode == False:
             self.iren.Render()
             self.iren.Start()
