@@ -82,13 +82,11 @@ class vtkRenderer():
             self.ren.RemoveActor(actor)
             #print("remove! ", name)
             
-
     def addLines(self, name, points, idx_list = None): # points => numpy vector [3, 0~n]
         self.removeActorByName(name)
         vtkpoints = vtk.vtkPoints()
         vtklines = vtk.vtkCellArray()
 
-        points = np.transpose(points)
         points_size = points.shape[0] 
         vtkpoints.SetNumberOfPoints(points_size)
         for idx, point in enumerate(points):
