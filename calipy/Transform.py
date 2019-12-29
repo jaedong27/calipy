@@ -60,6 +60,14 @@ class Transform():
         output.T_inv = self.T
         return output
 
+    def saveJson(self, path):
+        data = {}
+        data["rotation"] = self.R.tolist()
+        data["translation"] = self.T.tolist()
+
+        with open(path, 'w') as outfile:
+            json.dump(data, outfile, indent=4, sort_keys=True)
+
 if __name__=="__main__":
     po = Transform("rs_to_window_result.json")
     print(po.R)
