@@ -63,3 +63,33 @@ def loadJson(path):
     with open(path) as json_file:
         json_data = json.load(json_file)
     return json_data
+
+def getIntrinsicDataFromRS(intrinsic_string):
+    intrinsic = intrinsic_string.split(',')
+    
+    width = float(intrinsic[0].split(":")[1])
+    height = float(intrinsic[1].split(":")[1])
+    cx = float(intrinsic[2].split(":")[1]) # ppx
+    cy = float(intrinsic[3].split(":")[1]) # ppy
+    fx = float(intrinsic[4].split(":")[1])
+    fy = float(intrinsic[5].split(":")[1])
+
+    k1 = float(intrinsic[7].split(":")[1][2:])
+    k2 = float(intrinsic[8])
+    p1 = float(intrinsic[9])
+    p2 = float(intrinsic[10][1:])
+
+    return width, height, fx, fy, cx, cy, k1, k2, p1, p2
+
+def getExtrinsicDataFromRS(extrinsic_string):
+    extrinsic_string = extrinsic_string.replace("[", "")
+    extrinsic_string = extrinsic_string.replace("]", "")
+    extrinsic = extrinsic_string.split('\n')
+    rotation_str = extrinsic[0][1:].split(":")[1]
+    translation_str = extrinsic[1][1:].split(":")[1]
+    rotation = np.array(rotation_str.split(",")).astype(np.float)
+    rotation = np.reshape(rotation, (3,3))
+    translation = np.array(translation_str.split(",")).astype(np.float)
+    translation = np.reshape(translation, (3,1))
+
+    return rotation, translation
