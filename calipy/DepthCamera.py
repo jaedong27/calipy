@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import json
 from .ProjectiveObject import ProjectiveObject
-from . import imglib
+from . import lib
 import pptk
 
 class DepthCamera(ProjectiveObject):

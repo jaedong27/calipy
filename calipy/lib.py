@@ -1,3 +1,5 @@
+import os
+import json
 import cv2
 import numpy as np
 
@@ -19,12 +21,12 @@ def imwriteKorean(path, img):
         output.write(img_data)
     #return cv2.imdecode(numpyArray , cv2.IMREAD_UNCHANGED)
 
-def crop_img(frame, crop_ratio_coord):
+def cropImg(frame, crop_ratio_coord):
     width = frame.shape[1]
     height = frame.shape[0]
     return frame[0 + (int)(height * crop_ratio_coord[2]) : height - (int)(height * crop_ratio_coord[3]), 0 + (int)(width * crop_ratio_coord[0]):width - (int)(width * crop_ratio_coord[1])]
 
-def uncrop(frame, crop_ratio_coord, plane_points):
+def uncropImg(frame, crop_ratio_coord, plane_points):
     width = frame.shape[1]
     height = frame.shape[0]
     for point in plane_points:
@@ -32,7 +34,7 @@ def uncrop(frame, crop_ratio_coord, plane_points):
         point[1] += (int)(width * crop_ratio_coord[0])
     return plane_points
 
-def normalize_image(frame):
+def normalizeImg(frame):
     frame = np.clip(frame, 0, 5000) #normalize to 0-5000mm
     frame = np.uint8(frame / 5000.0 * 255)
     return frame
@@ -52,3 +54,12 @@ def getWarpedImageUsingH(img, h): # H scale is in 0.0 ~ 1.0
     to_norm_scale.astype(np.float32)
     h = np.dot(to_proj_scale, np.dot(h, to_norm_scale))
     return cv2.warpPerspective(img, h, (width, height))
+
+def loadJson(path):
+    json_data = {}
+    if os.path.isfile(path) == False:
+        return json_data
+
+    with open(path) as json_file:
+        json_data = json.load(json_file)
+    return json_data

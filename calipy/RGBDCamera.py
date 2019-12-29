@@ -6,7 +6,7 @@ import json
 from calipy.DepthCamera import DepthCamera
 from calipy.ColorCamera import ColorCamera
 from calipy.Transform import Transform
-import calipy.imglib
+import calipy.lib
 import pptk
 
 class RGBDCamera():
@@ -32,13 +32,13 @@ class RGBDCamera():
         return tex_img
 
     def getPointcloudTextureFromImageFile(self, pointcloud_list, tex_img_path):
-        tex_img = imglib.imreadKorean(tex_img_path)
+        tex_img = lib.imreadKorean(tex_img_path)
         return self.getPointcloudTexture(pointcloud_list, tex_img)
         
 if __name__=="__main__":
     rs_cam = RGBDCamera("depth_intrin.json", "color_intrin.json", "depth_to_color_extrin.json")
-    depth_img = imglib.imreadKorean("depth.png")
-    color_img = imglib.imreadKorean("color.png")
+    depth_img = lib.imreadKorean("depth.png")
+    color_img = lib.imreadKorean("color.png")
     # cv2.imshow("test", color_img)
     # cv2.waitKey(0)
     pointcloud = rs_cam.depth_camera.getPointCloudFromDepthImage(depth_img)

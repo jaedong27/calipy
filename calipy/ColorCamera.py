@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import json
 from calipy.ProjectiveObject import ProjectiveObject
-from calipy import imglib
+from calipy import lib
 import pptk
 
 class ColorCamera(ProjectiveObject):
