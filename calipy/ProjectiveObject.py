@@ -5,38 +5,45 @@ import os
 
 class ProjectiveObject():
     def __init__(self, param_path = ""):
-        if self.loadJson(param_path) == False:
-            #rms = 0.137250
-            fx = 1382.0
-            fy = 1382.0
-            cx = 959.241044
-            cy = 522.888753
+        if param_path == "" or self.loadJson(param_path) == False:
+            print("ProjectiveObject Init Default Value : ", param_path)
+            fx = 1024.0/2.0
+            fy = 1024.0/2.0
+            cx = 512.0
+            cy = 512.0
             #0.120684  -0.236034  -0.001411  -0.003282
-            k1 = 0.089712
-            k2 = -0.157344
-            p1 = -0.000022
-            p2 = -0.000450
+            k1 = 0.0
+            k2 = 0.0
+            p1 = 0.0
+            p2 = 0.0
             distortion = np.array([k1, k2, p1, p2])
             intrinsic = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
 
-            self.height = 1080
-            self.width = 1920
+            self.height = 1920
+            self.width = 1080
 
             self.intrinsic = intrinsic
             self.distortion = distortion
             self.intrinsic_inv = np.linalg.inv(self.intrinsic)
-            print("ProjectiveObject Load Fail : ", param_path)
         else:
             print("ProjectiveObject Load Success : ", param_path)
+            #print(self.__str__())
+        
         self.setRemapParam()
 
-        self.img = np.zeros((1080,1920,3))
+    def __str__(self):
+        string = "width : " + str(self.width) + " height : " + str(self.height) + "\n"
+        string += "intrinsic : \n"
+        string += self.intrinsic.__str__() + "\n"
+        string += "distortion : \n"
+        string += self.distortion.__str__() + "\n"
+        return string
 
     def setRemapParam(self):
         self.mtx = self.intrinsic
         self.dist = self.distortion
-        w = self.width
-        h = self.height
+        w = int(self.width)
+        h = int(self.height)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtx,self.dist,(w,h),1)
         self.mapx,self.mapy = cv2.initUndistortRectifyMap(self.mtx,self.dist,None,self.newcameramtx,(w,h),5)
 
@@ -89,6 +96,34 @@ class ProjectiveObject():
         with open(path, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
 
+    def setParamFromMatrix(self, intrinsic, distortion, width, height):
+        intrinsic = np.array(intrinsic)
+        distortion = np.array(distortion)
+
+        self.height = int(height)
+        self.width = int(width)
+
+        self.intrinsic = intrinsic
+        self.distortion = distortion
+        self.intrinsic_inv = np.linalg.inv(self.intrinsic)
+        self.setRemapParam()
+
+        #print(self.__str__())
+
+    def setParamFromValue(self, width, height, fx, fy, cx, cy, k1, k2, p1, p2):
+        intrinsic = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+        distortion = np.array([k1, k2, p1, p2])
+        
+        self.height = int(height)
+        self.width = int(width)
+
+        self.intrinsic = intrinsic
+        self.distortion = distortion
+        self.intrinsic_inv = np.linalg.inv(self.intrinsic)
+        self.setRemapParam()
+
+        #print(self.__str__())
+
     def solveDistortion(self, img):
         undistor_img = cv2.remap(img,self.mapx,self.mapy,cv2.INTER_LINEAR)
         return undistor_img
@@ -140,3 +175,6 @@ if __name__=="__main__":
     print(po.distortion)
     print(po.width)
     print(po.height)
+
+    t1 = ProjectiveObject()
+    t1.setParameterMatrix(po.intrinsic, po.distortion, po.width, po.height)

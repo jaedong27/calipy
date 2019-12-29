@@ -25,6 +25,19 @@ class Transform():
         self.T_inv = -np.dot(self.R_inv, self.T)
         return
 
+    def __str__(self):
+        string = "rotation : \n"
+        string += self.R.__str__() + "\n"
+        string += "translation : \n"
+        string += self.T.__str__() + "\n"
+        return string
+
+    def setParam(self, R, T):
+        self.R = R
+        self.T = T
+        self.R_inv = np.linalg.inv(self.R)
+        self.T_inv = -np.dot(self.R_inv, self.T)
+
     def translate(self, pointcloud): # (3, -)
         return np.dot(self.R, pointcloud) + self.T
 
