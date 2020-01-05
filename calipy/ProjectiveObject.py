@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import json
 import os
+import math
 
 class ProjectiveObject():
     def __init__(self, param_path = ""):
@@ -39,6 +40,10 @@ class ProjectiveObject():
         string += self.distortion.__str__() + "\n"
         return string
 
+    def calculateFOV(self):
+        self.HFOV = 2 * (180.0 / math.pi) * math.atan( self.intrinsic[0,0] / (self.width/2.0) )
+        self.VFOV = 2 * (180.0 / math.pi) * math.atan( self.intrinsic[1,1] / (self.height/2.0) )
+
     def setRemapParam(self):
         self.mtx = self.intrinsic
         self.dist = self.distortion
@@ -46,6 +51,8 @@ class ProjectiveObject():
         h = int(self.height)
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(self.mtx,self.dist,(w,h),1)
         self.mapx,self.mapy = cv2.initUndistortRectifyMap(self.mtx,self.dist,None,self.newcameramtx,(w,h),5)
+
+        self.calculateFOV()
 
     def loadJson(self, path):
         if not os.path.exists(path):

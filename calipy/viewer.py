@@ -60,7 +60,7 @@ class vtkRenderer():
         self.actor_list["axes"] = axes
         self.ren.ResetCamera()
 
-    def setMainCamera(self, R = np.eye(3), t = np.zeros((3,1))):
+    def setMainCamera(self, R = np.eye(3), t = np.zeros((3,1)), fov = 80):
         camera = vtk.vtkCamera()
         camera.SetPosition(t[0,0],t[1,0],t[2,0])
         #camera.SetFocalPoint(0,1,0)
@@ -72,7 +72,7 @@ class vtkRenderer():
         #camera.SetPosition(0,1,0)
         #camera.SetViewUp(0,1,0)
         camera.SetViewUp(cam_up[0],cam_up[1],cam_up[2])
-        camera.SetViewAngle(80)
+        camera.SetViewAngle(fov)
         self.ren.SetActiveCamera(camera)
 
     def removeActorByName(self, name):
