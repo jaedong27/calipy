@@ -41,8 +41,8 @@ class ProjectiveObject():
         return string
 
     def calculateFOV(self):
-        self.HFOV = 2 * (180.0 / math.pi) * math.atan( self.intrinsic[0,0] / (self.width/2.0) )
-        self.VFOV = 2 * (180.0 / math.pi) * math.atan( self.intrinsic[1,1] / (self.height/2.0) )
+        self.HFOV = 2 * (180.0 / math.pi) * math.atan( (self.width/2.0) / self.intrinsic[0,0] )
+        self.VFOV = 2 * (180.0 / math.pi) * math.atan( (self.height/2.0) / self.intrinsic[1,1] )
 
     def setRemapParam(self):
         self.mtx = self.intrinsic
