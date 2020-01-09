@@ -64,6 +64,10 @@ def loadJson(path):
         json_data = json.load(json_file)
     return json_data
 
+def saveJson(path, data_dic):
+    with open(path, 'w') as outfile:
+        json.dump(data_dic, outfile)
+
 def getIntrinsicDataFromRS(intrinsic_string):
     intrinsic = intrinsic_string.split(',')
     
