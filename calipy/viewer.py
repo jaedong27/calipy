@@ -75,6 +75,9 @@ class vtkRenderer():
         camera.SetViewAngle(fov)
         self.ren.SetActiveCamera(camera)
 
+    def getActorList(self):
+        return self.actor_list.keys()
+
     def removeActorByName(self, name):
         #print(self.actor_list)
         if name in self.actor_list.keys():
