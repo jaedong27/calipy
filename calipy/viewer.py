@@ -229,8 +229,8 @@ class vtkRenderer():
         self.actor_list[name] = polygonActor
 
     def render(self):
+        self.iren.Render()
         if self.qtwidget_mode == False:
-            self.iren.Render()
             self.iren.Start()
 
 if __name__ == "__main__":
