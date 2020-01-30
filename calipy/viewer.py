@@ -60,6 +60,17 @@ class vtkRenderer():
         self.actor_list["axes"] = axes
         self.ren.ResetCamera()
 
+        self.iren.AddObserver('LeftButtonPressEvent', self.pushLeftButtonPressEventOnVTK, 1.0)
+
+    # Add Event for get Position
+    def pushLeftButtonPressEventOnVTK(self, obj, ev):
+        clickPos = self.iren.GetEventPosition()
+        #print(clickPos)
+        picker = vtk.vtkPropPicker()
+        picker.Pick(clickPos[0], clickPos[1], 0, self.ren)
+        print(picker.GetPickPosition())
+
+
     def setMainCamera(self, R = np.eye(3), t = np.zeros((3,1)), fov = 80):
         camera = vtk.vtkCamera()
         camera.SetPosition(t[0,0],t[1,0],t[2,0])
