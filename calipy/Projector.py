@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import json
 from calipy.ProjectiveObject import ProjectiveObject
-import pptk
 
 class Projector(ProjectiveObject):
     def __init__(self, param_path = ""):

@@ -5,7 +5,6 @@ import numpy as np
 import json
 from calipy.ProjectiveObject import ProjectiveObject
 from calipy import lib
-import pptk
 
 class ColorCamera(ProjectiveObject):
     def __init__(self, param_path = ""):

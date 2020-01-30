@@ -5,7 +5,6 @@ import numpy as np
 import json
 from .ProjectiveObject import ProjectiveObject
 from . import lib
-import pptk
 
 class DepthCamera(ProjectiveObject):
     def __init__(self, param_path = ""):
@@ -38,4 +37,3 @@ if __name__=="__main__":
     image = lib.imreadKorean("depth.png")
     #print(image.shape)
     pointcloud = dc.getPointCloudFromDepthImage(image)
-    v = pptk.viewer(np.transpose(pointcloud))
