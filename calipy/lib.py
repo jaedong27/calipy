@@ -278,3 +278,10 @@ def getHomography(target_points):
     uv = np.array([[0,0],[1,0],[0,1],[1,1]])
     H, status = cv2.findHomography(uv, target_points)
     return H
+
+def getPointsOnPlaneUsingUV(uv_points, cam_intrinsic_inv, plane_normal, mean): # (uv_points : (-1,3), plane_normal : (1,3))
+    uv_points = np.concatenate((uv_points, np.ones((uv_points.shape[0],1))), axis=1)
+    uv_dir_on_rs = np.dot(cam_intrinsic_inv, np.transpose(uv_points))
+    u_value = np.dot(plane_normal, np.transpose(np.array(mean))) / np.dot(plane_normal, uv_dir_on_rs)
+    object_points = u_value * uv_dir_on_rs
+    return object_points
