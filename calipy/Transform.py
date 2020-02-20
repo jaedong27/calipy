@@ -62,8 +62,8 @@ class Transform():
 
     def saveJson(self, path):
         data = {}
-        data["rotation"] = self.R.tolist()
-        data["translation"] = self.T.tolist()
+        data["R"] = self.R.tolist()
+        data["T"] = self.T.tolist()
 
         with open(path, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
