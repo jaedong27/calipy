@@ -201,7 +201,7 @@ class vtkRenderer():
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
-    def drawPoints(self, name, point_list, input_color=np.array([[255,0,0]])):
+    def drawPoints(self, name, point_list, input_color=np.array([[255,0,0]]), point_size = 2):
         self.removeActorByName(name)
         points = vtk.vtkPoints()
         vertices = vtk.vtkCellArray()
@@ -235,7 +235,7 @@ class vtkRenderer():
             polygonMapper.Update()
         polygonActor = vtk.vtkActor()
         polygonActor.SetMapper(polygonMapper)
-        polygonActor.GetProperty().SetPointSize(2)
+        polygonActor.GetProperty().SetPointSize(point_size)
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
