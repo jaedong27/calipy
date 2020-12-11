@@ -247,12 +247,12 @@ class vtkRenderer():
 if __name__ == "__main__":
     window_width = 1.18
     window_height = 0.75
-    window_points = [[-window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), -window_height*math.sin((5.0/180.0) * math.pi)],
-                     [ window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), -window_height*math.sin((5.0/180.0) * math.pi)],
+    window_points = [[-window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), 0],
+                     [ window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), 0],
                      [-window_width/2, 0, 0],
                      [ window_width/2, 0, 0]]
     index = np.array([0,1,3,2,0])
 
     ren = vtkRenderer()
-    ren.addLines(np.transpose(window_points), index)
-    ren.showImage()
+    ren.addLines("line", np.array(window_points), index)
+    ren.render()
