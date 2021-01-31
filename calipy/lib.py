@@ -60,13 +60,13 @@ def loadJson(path):
     if os.path.isfile(path) == False:
         return json_data
 
-    with open(path) as json_file:
+    with open(path, encoding='utf-8') as json_file:
         json_data = json.load(json_file)
     return json_data
 
 def saveJson(path, data_dic):
     with open(path, 'w') as outfile:
-        json.dump(data_dic, outfile)
+        json.dump(data_dic, outfile, indent=4)
 
 def getIntrinsicDataFromRS(intrinsic_string):
     intrinsic = intrinsic_string.split(',')
@@ -97,7 +97,7 @@ def getExtrinsicDataFromRS(extrinsic_string):
     translation = np.reshape(translation, (3,1))
 
     return rotation, translation
-    
+
 def drawScreen(img, sc):
     #모든 정보는 0~1로 스케일
     height = img.shape[0]

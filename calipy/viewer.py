@@ -86,6 +86,33 @@ class vtkRenderer():
         camera.SetViewAngle(fov)
         self.ren.SetActiveCamera(camera)
 
+    def setMainCameraToSeeTarget(self, t = np.zeros((3,1)), target = np.zeros((3,1)), fov = 80):
+        camera = vtk.vtkCamera()
+        camera.SetPosition(t[0,0],t[1,0],t[2,0])
+        #print("Position :", t)
+        #camera.SetFocalPoint(0,1,0)
+        #focalpoint = np.array([[0],[0],[1]])
+        #focalpoint = np.dot(R,focalpoint) + t
+        target_focalpoint = (target - t).ravel()
+        #print(target_focalpoint)
+        target_focalpoint = target_focalpoint / np.linalg.norm(target_focalpoint)
+        #print("focalpoint", target)
+        camera.SetFocalPoint(target[0],target[1],target[2])
+        ref = np.array([[0],[-1],[0]]).ravel()
+        #print(focalpoint, ref)
+        ref_right = np.cross(target_focalpoint, ref)
+        ref_right = ref_right / np.linalg.norm(ref_right)
+        #print(ref_right, focalpoint)
+        cam_up = np.cross(ref_right, target_focalpoint)
+        cam_up = cam_up / np.linalg.norm(cam_up)
+        print("Up",cam_up)
+        #cam_up = np.dot(R, ref)
+        #camera.SetPosition(0,1,0)
+        #camera.SetViewUp(0,1,0)
+        camera.SetViewUp(cam_up[0],cam_up[1],cam_up[2])
+        camera.SetViewAngle(fov)
+        self.ren.SetActiveCamera(camera)
+
     def getActorList(self):
         return self.actor_list.keys()
 
@@ -96,15 +123,68 @@ class vtkRenderer():
             self.ren.RemoveActor(actor)
             #print("remove! ", name)
             
-    def addLines(self, name, points, idx_list = None): # points => numpy vector [3, 0~n]
+    def addText(self, name, text, pos_x, pos_y):
+        self.removeActorByName(name)
+        textActor = vtk.vtkTextActor()
+        textActor.SetInput( text )
+        textActor.SetPosition( pos_x, pos_y )
+        textActor.GetTextProperty().SetFontSize ( 50 )
+        textActor.GetTextProperty().SetColor ( 1.0, 1.0, 1.0 )
+        self.ren.AddActor2D(textActor)
+        self.actor_list[name] = textActor
+    
+    def addPlane(self, name, point1, point2, point3, color=np.array([255.0,255.0,255.0]), opacity=1.0):
+        self.removeActorByName(name)
+
+        # Create a plane
+        planeSource = vtk.vtkPlaneSource()
+        # planeSource.SetOrigin(center_point[0], center_point[1], center_point[2])
+        # #planeSource.SetNormal(normal_vector[0], normal_vector[1], normal_vector[2])
+        # #print(dir(planeSource))
+        # planeSource.SetPoint1(top_left_point[0], top_left_point[1], top_left_point[2])
+        # planeSource.SetPoint2(bot_right_point[0], bot_right_point[1], bot_right_point[2])
+        # planeSource.SetXResolution(10)
+        # planeSource.SetYResolution(340)
+        planeSource.SetOrigin(point1[0], point1[1], point1[2])
+        planeSource.SetPoint1(point2[0], point2[1], point2[2])
+        planeSource.SetPoint2(point3[0], point3[1], point3[2])
+        planeSource.SetXResolution(10)
+        planeSource.SetYResolution(340)
+
+        planeSource.Update()
+
+        plane = planeSource.GetOutput()
+
+        # Create a mapper and actor
+        polygonMapper = vtk.vtkPolyDataMapper()
+        if vtk.VTK_MAJOR_VERSION <= 5:
+            polygonMapper.SetInputConnection(polygon.GetProducerPort())
+        else:
+            polygonMapper.SetInputData(plane)
+            polygonMapper.Update()
+
+        polygonActor = vtk.vtkActor()
+        polygonActor.SetMapper(polygonMapper)
+        polygonActor.GetProperty().SetColor([color[0],color[1],color[2]])
+        polygonActor.GetProperty().SetOpacity(opacity)
+        #actor.GetProperty().SetColor(colors->GetColor3d("Cyan").GetData());
+
+        self.ren.AddActor(polygonActor)
+        self.actor_list[name] = polygonActor
+
+    def addLines(self, name, points, idx_list = None, line_width = 1, color=np.array([255.0,255.0,255.0])): # points => numpy vector [3, 0~n]
         self.removeActorByName(name)
         vtkpoints = vtk.vtkPoints()
         vtklines = vtk.vtkCellArray()
+        colors = vtk.vtkUnsignedCharArray()
+        colors.SetNumberOfComponents(3)
 
         points_size = points.shape[0] 
         vtkpoints.SetNumberOfPoints(points_size)
         for idx, point in enumerate(points):
             vtkpoints.SetPoint(idx, point[0], point[1], point[2])
+            colors.InsertNextTuple(color)
+        colors.SetName(name+"_colors")
 
         if idx_list is None:
             vtklines.InsertNextCell(points_size)
@@ -118,6 +198,7 @@ class vtkRenderer():
         polygon = vtk.vtkPolyData()
         polygon.SetPoints(vtkpoints)
         polygon.SetLines(vtklines)
+        polygon.GetCellData().SetScalars(colors)
 
         polygonMapper = vtk.vtkPolyDataMapper()
         if vtk.VTK_MAJOR_VERSION <= 5:
@@ -128,11 +209,12 @@ class vtkRenderer():
 
         polygonActor = vtk.vtkActor()
         polygonActor.SetMapper(polygonMapper)
+        polygonActor.GetProperty().SetLineWidth(line_width)
 
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
-    def addCamera(self, name, R = np.eye(3), t = np.zeros((3,1)), cs = 0.1): 
+    def addCamera(self, name, R = np.eye(3), t = np.zeros((3,1)), cs = 0.1, line_width = 2, color=np.array([255,255,255])):
         self.removeActorByName(name)
         camera_points = np.zeros((12,3))
         camera_points[0,:] = np.array([-cs/2, -cs/2, cs])
@@ -154,8 +236,14 @@ class vtkRenderer():
 
         points = vtk.vtkPoints()
         points.SetNumberOfPoints(12)
+        colors = vtk.vtkUnsignedCharArray()
+        points.SetNumberOfPoints(12)
+        colors.SetNumberOfComponents(3)
+
         for idx, point in enumerate(camera_points):
             points.SetPoint(idx, point[0], point[1], point[2])
+            colors.InsertNextTuple(color)
+        colors.SetName(name+"_colors")
 
         lines = vtk.vtkCellArray()
         lines.InsertNextCell(24)
@@ -187,6 +275,7 @@ class vtkRenderer():
         polygon = vtk.vtkPolyData()
         polygon.SetPoints(points)
         polygon.SetLines(lines)
+        polygon.GetCellData().SetScalars(colors)
 
         polygonMapper = vtk.vtkPolyDataMapper()
         if vtk.VTK_MAJOR_VERSION <= 5:
@@ -198,6 +287,7 @@ class vtkRenderer():
         polygonActor = vtk.vtkActor()
         polygonActor.SetMapper(polygonMapper)
         polygonActor.GetProperty().SetPointSize(0.1)
+        polygonActor.GetProperty().SetLineWidth(line_width)
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
@@ -247,12 +337,12 @@ class vtkRenderer():
 if __name__ == "__main__":
     window_width = 1.18
     window_height = 0.75
-    window_points = [[-window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), 0],
-                     [ window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), 0],
+    window_points = [[-window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), -window_height*math.sin((5.0/180.0) * math.pi)],
+                     [ window_width/2, -window_height*math.cos((5.0/180.0) * math.pi), -window_height*math.sin((5.0/180.0) * math.pi)],
                      [-window_width/2, 0, 0],
                      [ window_width/2, 0, 0]]
     index = np.array([0,1,3,2,0])
 
     ren = vtkRenderer()
-    ren.addLines("line", np.array(window_points), index)
-    ren.render()
+    ren.addLines(np.transpose(window_points), index)
+    ren.showImage()
