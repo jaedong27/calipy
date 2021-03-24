@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import glob
+import sys
+sys.path.append("../")
 import calipy
 
 Rt_path = "./CameraData/Rt.json"

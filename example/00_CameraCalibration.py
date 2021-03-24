@@ -1,7 +1,10 @@
 import numpy as np
 import cv2
 import glob
+import sys
+sys.path.append("../")
 import calipy
+
 
 data_list_seed = "./CameraData/Back/*.png"
 output_path = "./CameraData/Back/cam_intrinsic.json"
