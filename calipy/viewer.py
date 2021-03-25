@@ -172,6 +172,85 @@ class vtkRenderer():
         self.ren.AddActor(polygonActor)
         self.actor_list[name] = polygonActor
 
+    def addPlanWithTexture(self, name, point1, point2, point3, path, opacity=1.0):
+        self.removeActorByName(name)
+
+        #png_file = vtk.vtkPNGReader()
+        #print(png_file.CanReadFile(path))
+
+        # Read the image which will be the texture
+        #vtkSmartPointer<vtkJPEGReader> jPEGReader = vtkSmartPointer<vtkJPEGReader>::New();
+        #jPEGReader->SetFileName ( inputFilename.c_str() );
+        img = vtk.vtkJPEGReader()
+        img.SetFileName(path)
+        
+        #print(img.CanReadFile(path))
+        #print(path)
+
+        # Create a plane
+        #vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+        #plane->SetCenter(0.0, 0.0, 0.0);
+        #plane->SetNormal(0.0, 0.0, 1.0);
+        plane = vtk.vtkPlaneSource()
+        # planeSource.SetOrigin(center_point[0], center_point[1], center_point[2])
+        # #planeSource.SetNormal(normal_vector[0], normal_vector[1], normal_vector[2])
+        # #print(dir(planeSource))
+        # planeSource.SetPoint1(top_left_point[0], top_left_point[1], top_left_point[2])
+        # planeSource.SetPoint2(bot_right_point[0], bot_right_point[1], bot_right_point[2])
+        # planeSource.SetXResolution(10)
+        # planeSource.SetYResolution(340)
+        #plane.SetCenter(0.0,0.0,0.0)
+        #plane.SetNormal(0.0,0.0,1.0)
+        plane.SetOrigin(point1[0], point1[1], point1[2])
+        plane.SetPoint1(point2[0], point2[1], point2[2])
+        plane.SetPoint2(point3[0], point3[1], point3[2])
+        plane.SetXResolution(1920)
+        plane.SetYResolution(1080)
+
+        # Apply the texture
+        #vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+        #texture->SetInputConnection(jPEGReader->GetOutputPort());
+        texture = vtk.vtkTexture()
+        texture.SetInputConnection(img.GetOutputPort())
+
+        #vtkSmartPointer<vtkTextureMapToPlane> texturePlane = vtkSmartPointer<vtkTextureMapToPlane>::New();
+        #texturePlane->SetInputConnection(plane->GetOutputPort());
+        texturePlane = vtk.vtkTextureMapToPlane()
+        texturePlane.SetInputConnection(plane.GetOutputPort())
+
+        #planeSource.Update()
+        #plane = planeSource.GetOutput()
+
+        #vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        #planeMapper->SetInputConnection(texturePlane->GetOutputPort());
+        planeMapper = vtk.vtkPolyDataMapper()
+        planeMapper.SetInputConnection(texturePlane.GetOutputPort())
+
+        #vtkSmartPointer<vtkActor> texturedPlane = vtkSmartPointer<vtkActor>::New();
+        #texturedPlane->SetMapper(planeMapper);
+        #texturedPlane->SetTexture(texture);
+        texturedPlane = vtk.vtkActor()
+        texturedPlane.SetMapper(planeMapper)
+        texturedPlane.SetTexture(texture)
+
+        # Create a mapper and actor
+        #polygonMapper = vtk.vtkPolyDataMapper()
+        #if vtk.VTK_MAJOR_VERSION <= 5:
+        #    polygonMapper.SetInputConnection(texturePlane.GetProducePort())
+        #else:
+        #    polygonMapper.SetInputData(texturePlane.GetOutput())
+        #    polygonMapper.Update()
+
+        #polygonActor = vtk.vtkActor()
+        #polygonActor.SetMapper(polygonMapper)
+        #polygonActor.SetTexture(texture)
+        #polygonActor.GetProperty().SetColor([color[0],color[1],color[2]])
+        #polygonActor.GetProperty().SetOpacity(opacity)
+        #actor.GetProperty().SetColor(colors->GetColor3d("Cyan").GetData());
+
+        self.ren.AddActor(texturedPlane)
+        self.actor_list[name] = texturedPlane
+
     def addLines(self, name, points, idx_list = None, line_width = 1, color=np.array([255.0,255.0,255.0])): # points => numpy vector [3, 0~n]
         self.removeActorByName(name)
         vtkpoints = vtk.vtkPoints()
