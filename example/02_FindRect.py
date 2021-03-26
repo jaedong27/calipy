@@ -12,6 +12,7 @@ output_path = "./Cameradata/TVRT.json"
 
 img = calipy.lib.imreadKorean(target_img_path)
 cam_param = calipy.ColorCamera(cam_param_path)
+img = cam_param.solveDistortion(img)
 
 offset = 300
 uv_points = np.array([ [offset,offset], 
@@ -92,7 +93,8 @@ imagePoints = np.array(imagePoints).astype(np.float64)
 
 print(imagePoints.dtype, objectPoints.dtype)
 
-res, Rvec, T = cv2.solvePnP(objectPoints, imagePoints, cam_intrinsic, distCoeffs)
+#res, Rvec, T = cv2.solvePnP(objectPoints, imagePoints, cam_intrinsic, distCoeffs)
+res, Rvec, T = cv2.solvePnP(objectPoints, imagePoints, cam_intrinsic, np.array([0,0,0,0,0]))
 R, _ = cv2.Rodrigues(Rvec)
 
 output = np.dot(cam_intrinsic,(np.dot(R,np.transpose(objectPoints)) + T))

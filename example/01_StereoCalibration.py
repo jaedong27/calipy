@@ -50,6 +50,9 @@ for i, fname in enumerate(front_img_list):
     img_f = cv2.imread(front_img_list[i])
     img_b = cv2.imread(back_img_list[i])
 
+    img_f = back_cam.solveDistortion(img_f)
+    img_b = back_cam.solveDistortion(img_b)
+
     gray_f = cv2.cvtColor(img_f, cv2.COLOR_BGR2GRAY)
     gray_b = cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
 
@@ -97,23 +100,37 @@ for i, fname in enumerate(front_img_list):
 flags = 0
 flags |= cv2.CALIB_FIX_INTRINSIC
 # flags |= cv2.CALIB_FIX_PRINCIPAL_POINT
-flags |= cv2.CALIB_USE_INTRINSIC_GUESS
-flags |= cv2.CALIB_FIX_FOCAL_LENGTH
+# flags |= cv2.CALIB_USE_INTRINSIC_GUESS
+# flags |= cv2.CALIB_FIX_FOCAL_LENGTH
 # flags |= cv2.CALIB_FIX_ASPECT_RATIO
-flags |= cv2.CALIB_ZERO_TANGENT_DIST
+# flags |= cv2.CALIB_ZERO_TANGENT_DIST
 # flags |= cv2.CALIB_RATIONAL_MODEL
 # flags |= cv2.CALIB_SAME_FOCAL_LENGTH
 # flags |= cv2.CALIB_FIX_K3
 # flags |= cv2.CALIB_FIX_K4
 # flags |= cv2.CALIB_FIX_K5
 
+print("prev")
+print(front_cam.intrinsic, front_cam.dist)
+print(back_cam.intrinsic, back_cam.dist)
+
 stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER +
                         cv2.TERM_CRITERIA_EPS, 100, 1e-5)
+# ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(
+#     objpoints, imgpoints_front,
+#     imgpoints_back, front_cam.intrinsic, front_cam.dist, back_cam.intrinsic, 
+#     back_cam.dist, (1920, 1080),
+#     criteria=stereocalib_criteria, flags=flags)
 ret, M1, d1, M2, d2, R, T, E, F = cv2.stereoCalibrate(
     objpoints, imgpoints_front,
-    imgpoints_back, front_cam.intrinsic, front_cam.dist, back_cam.intrinsic, 
-    back_cam.dist, (1920, 1080),
+    imgpoints_back, front_cam.intrinsic, np.array([0,0,0,0,0]), back_cam.intrinsic, 
+    np.array([0,0,0,0,0]), (1920, 1080),
     criteria=stereocalib_criteria, flags=flags)
+
+
+print("back")
+print(front_cam.intrinsic, front_cam.dist)
+print(back_cam.intrinsic, back_cam.dist)
 
 print('Intrinsic_mtx_1', M1)
 print('dist_1', d1)
